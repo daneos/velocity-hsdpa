@@ -5,6 +5,10 @@
 #define VID		0x0537
 #define PID		0xb000
 
+#define EOK			0
+#define ENOTFOUND	-1
+#define EOPENFAIL	-2
+
 void init_usb(void);
 static struct usb_device *getDevice(uint16_t vendor, uint16_t product);
 
@@ -16,10 +20,20 @@ int main (int argc,char **argv)
 	if((dev = getDevice(VID, PID)) == NULL)
 	{
 		printf("%s: No VHSDPA modems found.\n", DRIVER);
-		return 1;
+		return ENOTFOUND;
 	}
 	printf("%s: VHSDPA modem found.\n", DRIVER);
-	return 0;
+	struct usb_dev_handle *hdev;
+	if((hdev = usb_open(dev)) == NULL)
+	{
+		printf("%s: could not open the device.\n", DRIVER);
+		return EOPENFAIL;
+	}
+
+	// do something...
+
+	usb_close(hdev);
+	return EOK;
 }
 //-----------------------------------------------------------------------------
 
